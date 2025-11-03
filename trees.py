@@ -12,13 +12,11 @@ class BST:
 
     def _inserir_rec(self, no, chave, dados):
         if no is None:
-            # Cria um nó novo com a lista de dados
             return Node(chave, [dados])
 
         self.comparacoes += 1
 
         if chave == no.chave:
-            # Chave já existe, adiciona o novo dado à lista
             no.dados.append(dados)
         elif chave < no.chave:
             no.esquerdo = self._inserir_rec(no.esquerdo, chave, dados)
@@ -28,7 +26,7 @@ class BST:
         return no
 
     def buscar(self, chave):
-        """Busca um nó pela chave e retorna todos os dados do nó"""
+        """Busca um nó pela chave"""
         return self._buscar_rec(self.raiz, chave)
 
     def _buscar_rec(self, no, chave):
@@ -42,23 +40,48 @@ class BST:
         else:
             return self._buscar_rec(no.direito, chave)
 
-    def buscar_todos(self, chave):
-        """Retorna todos os dados de nós que possuem a chave informada"""
-        resultados = []
-        self._buscar_todos_rec(self.raiz, chave, resultados)
-        return resultados
+    # Adicione este método na classe BST
 
-    def _buscar_todos_rec(self, no, chave, resultados):
+    def remover_n(self, chave, n):
+        """Remove até n elementos com a chave informada"""
+        for _ in range(n):
+            if self.buscar(chave):
+                self.raiz = self._remover_rec(self.raiz, chave)
+            else:
+                break
+
+    def _remover_rec(self, no, chave):
+        """Remoção recursiva de um nó pela chave"""
         if no is None:
-            return
-        # Percorre esquerda
-        self._buscar_todos_rec(no.esquerdo, chave, resultados)
-        # Verifica se a chave é igual
-        if no.chave == chave:
-            resultados.extend(no.dados)
-            self.comparacoes += 1
-        # Percorre direita
-        self._buscar_todos_rec(no.direito, chave, resultados)
+            return None
+        self.comparacoes += 1
+        if chave < no.chave:
+            no.esquerdo = self._remover_rec(no.esquerdo, chave)
+        elif chave > no.chave:
+            no.direito = self._remover_rec(no.direito, chave)
+        else:
+            # Caso haja múltiplos dados, remove apenas um do nó
+            if len(no.dados) > 1:
+                no.dados.pop(0)
+                return no
+            # Nó com zero ou um filho
+            if no.esquerdo is None:
+                return no.direito
+            elif no.direito is None:
+                return no.esquerdo
+            # Nó com dois filhos: substitui pelo menor da subárvore direita
+            temp = self._minimo(no.direito)
+            no.chave = temp.chave
+            no.dados = temp.dados
+            no.direito = self._remover_rec(no.direito, temp.chave)
+        return no
+
+    def _minimo(self, no):
+        """Retorna o nó com a menor chave da árvore/subárvore"""
+        current = no
+        while current.esquerdo is not None:
+            current = current.esquerdo
+        return current
 
     def altura(self):
         """Retorna a altura da árvore"""
