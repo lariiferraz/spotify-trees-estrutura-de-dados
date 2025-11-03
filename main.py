@@ -1,11 +1,11 @@
 # main.py
 import time
-from trees import BST, AVL
+from trees import BST, AVL, RedBlack
 from loader import load_spotify_dataset
 
 def submenu_arvore(arvore, nome):
     """
-    Submenu padrão para interagir com uma árvore (BST ou AVL)
+    Submenu padrão para interagir com uma árvore (BST, AVL ou Red-Black)
     """
     while True:
         print(f"\n--- Submenu {nome} ---")
@@ -55,14 +55,14 @@ def submenu_arvore(arvore, nome):
 
 def comparar_arvores(dataset):
     """
-    Executa um teste de comparação entre BST e AVL para tamanhos progressivos.
+    Executa um teste de comparação entre BST, AVL e Red-Black para tamanhos progressivos.
     """
     tamanhos = [100, 500, 2000, 10000, 50000, 100000, len(dataset)]
     
     for n in tamanhos:
         print(f"\n--- Teste com {n} músicas ---")
         dataset_teste = dataset[:n]
-        arvores = [("BST", BST()), ("AVL", AVL())]
+        arvores = [("BST", BST()), ("AVL", AVL()), ("Red-Black", RedBlack())]
         resultados = []
 
         for nome, arvore in arvores:
@@ -78,12 +78,12 @@ def comparar_arvores(dataset):
             end_insercao = time.time()
 
             start_busca = time.time()
-            for linha in dataset_teste[:10]:  # busca 10 elementos aleatórios
+            for linha in dataset_teste[:10]:
                 arvore.buscar(linha['popularity'])
             end_busca = time.time()
 
             start_remocao = time.time()
-            for linha in dataset_teste[:10]:  # remove 10 elementos aleatórios
+            for linha in dataset_teste[:10]:
                 arvore.remover_n(linha['popularity'], 1)
             end_remocao = time.time()
 
@@ -112,7 +112,7 @@ def main():
         print("\n--- Menu Principal ---")
         print("1 - Usar árvore AVL")
         print("2 - Usar árvore BST")
-        # print("3 - Usar árvore Red-Black")  # ainda não implementada
+        print("3 - Usar árvore Red-Black")
         print("4 - Comparação de desempenho entre árvores")
         print("5 - Sair")
         opcao = input("\nEscolha uma opção: \n")
@@ -148,6 +148,22 @@ def main():
             end_time = time.time()
             print(f"Tempo de inserção na BST: {end_time - start_time:.4f} segundos")
             submenu_arvore(arvore, "BST")
+
+        elif opcao == '3':
+            arvore = RedBlack()
+            print("Árvore Red-Black criada!")
+            start_time = time.time()
+            for linha in dataset:
+                chave = linha['popularity']
+                dados = {
+                    'track_name': linha['track_name'],
+                    'artist_name': linha['artist_name'],
+                    'genre': linha['genre']
+                }
+                arvore.inserir(chave, dados)
+            end_time = time.time()
+            print(f"Tempo de inserção na Red-Black: {end_time - start_time:.4f} segundos")
+            submenu_arvore(arvore, "Red-Black")
 
         elif opcao == '4':
             comparar_arvores(dataset)

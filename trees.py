@@ -1,5 +1,5 @@
 # trees.py
-from node import Node
+from node import Node, NodeRB
 
 class BST:
     def __init__(self):
@@ -242,3 +242,148 @@ class AVL:
 
     def contador_comparacoes(self):
         return self.comparacoes
+
+class RedBlack:
+    def __init__(self):
+        self.raiz = None
+        self.comparacoes = 0
+
+    def buscar(self, chave):
+        return self._buscar_rec(self.raiz, chave)
+
+    def _buscar_rec(self, no, chave):
+        if no is None:
+            return None
+        self.comparacoes += 1
+        if chave == no.chave:
+            return no.dados
+        elif chave < no.chave:
+            return self._buscar_rec(no.esquerdo, chave)
+        else:
+            return self._buscar_rec(no.direito, chave)
+
+    def inserir(self, chave, dados):
+        novo = NodeRB(chave, dados)
+        self.raiz = self._inserir_rec(self.raiz, novo)
+        self._inserir_fixup(novo)
+        self.raiz.cor = "preto"
+
+    def _inserir_rec(self, raiz, no):
+        if raiz is None:
+            return no
+        self.comparacoes += 1
+        if no.chave < raiz.chave:
+            raiz.esquerdo = self._inserir_rec(raiz.esquerdo, no)
+            raiz.esquerdo.pai = raiz
+        elif no.chave > raiz.chave:
+            raiz.direito = self._inserir_rec(raiz.direito, no)
+            raiz.direito.pai = raiz
+        else:
+            raiz.dados.append(no.dados[0])
+        return raiz
+
+    def _rotacionar_esquerda(self, x):
+        y = x.direito
+        x.direito = y.esquerdo
+        if y.esquerdo:
+            y.esquerdo.pai = x
+        y.pai = x.pai
+        if x.pai is None:
+            self.raiz = y
+        elif x == x.pai.esquerdo:
+            x.pai.esquerdo = y
+        else:
+            x.pai.direito = y
+        y.esquerdo = x
+        x.pai = y
+
+    def _rotacionar_direita(self, y):
+        x = y.esquerdo
+        y.esquerdo = x.direito
+        if x.direito:
+            x.direito.pai = y
+        x.pai = y.pai
+        if y.pai is None:
+            self.raiz = x
+        elif y == y.pai.direito:
+            y.pai.direito = x
+        else:
+            y.pai.esquerdo = x
+        x.direito = y
+        y.pai = x
+
+    def _inserir_fixup(self, z):
+        while z.pai and z.pai.cor == "vermelho":
+            if z.pai == z.pai.pai.esquerdo:
+                y = z.pai.pai.direito
+                if y and y.cor == "vermelho":  # Caso 1
+                    z.pai.cor = "preto"
+                    y.cor = "preto"
+                    z.pai.pai.cor = "vermelho"
+                    z = z.pai.pai
+                else:
+                    if z == z.pai.direito:  # Caso 2
+                        z = z.pai
+                        self._rotacionar_esquerda(z)
+                    # Caso 3
+                    z.pai.cor = "preto"
+                    z.pai.pai.cor = "vermelho"
+                    self._rotacionar_direita(z.pai.pai)
+            else:  # Espelho
+                y = z.pai.pai.esquerdo
+                if y and y.cor == "vermelho":
+                    z.pai.cor = "preto"
+                    y.cor = "preto"
+                    z.pai.pai.cor = "vermelho"
+                    z = z.pai.pai
+                else:
+                    if z == z.pai.esquerdo:
+                        z = z.pai
+                        self._rotacionar_direita(z)
+                    z.pai.cor = "preto"
+                    z.pai.pai.cor = "vermelho"
+                    self._rotacionar_esquerda(z.pai.pai)
+        self.raiz.cor = "preto"
+
+    def altura(self):
+        def _altura(no):
+            if no is None:
+                return 0
+            return 1 + max(_altura(no.esquerdo), _altura(no.direito))
+        return _altura(self.raiz)
+
+    def contador_comparacoes(self):
+        return self.comparacoes
+
+    def remover_n(self, chave, n):
+        """Remove até n elementos com a chave informada (implementação simples, sem fixup RB)"""
+        for _ in range(n):
+            if self.buscar(chave):
+                self.raiz = self._remover_rec(self.raiz, chave)
+            else:
+                break
+
+    def _remover_rec(self, no, chave):
+        """Remoção simples igual BST, sem balanceamento RB completo"""
+        if no is None:
+            return None
+        self.comparacoes += 1
+        if chave < no.chave:
+            no.esquerdo = self._remover_rec(no.esquerdo, chave)
+        elif chave > no.chave:
+            no.direito = self._remover_rec(no.direito, chave)
+        else:
+            if len(no.dados) > 1:
+                no.dados.pop(0)
+                return no
+            if no.esquerdo is None:
+                return no.direito
+            elif no.direito is None:
+                return no.esquerdo
+            temp = no.direito
+            while temp.esquerdo:
+                temp = temp.esquerdo
+            no.chave = temp.chave
+            no.dados = temp.dados
+            no.direito = self._remover_rec(no.direito, temp.chave)
+        return no

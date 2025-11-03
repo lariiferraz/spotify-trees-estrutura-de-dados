@@ -16,3 +16,13 @@ class Node:
         self.esquerdo = None        # Filho esquerdo
         self.direito = None         # Filho direito
         self.cor = cor              # Para Red-Black
+        self.altura = 1             # Altura inicial do nó é 1
+
+class NodeRB:
+    def __init__(self, chave, dados, cor="vermelho"):
+        self.chave = chave
+        self.dados = [dados]
+        self.esquerdo = None
+        self.direito = None
+        self.pai = None
+        self.cor = cor  # "vermelho" ou "preto"
