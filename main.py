@@ -2,6 +2,8 @@ import time
 import matplotlib.pyplot as plt
 from trees import BST, AVL, RedBlack
 from loader import load_spotify_dataset
+import pandas as pd
+
 
 def submenu_arvore(arvore, nome):
     while True:
@@ -11,7 +13,7 @@ def submenu_arvore(arvore, nome):
         print("3 - Mostrar altura e comparações")
         print("4 - Voltar ao menu principal")
         opcao = input("\nEscolha uma opção: \n")
-        
+
         if opcao == '1':
             pop = int(input("Digite a popularidade da música: "))
             start_time = time.time()
@@ -51,6 +53,7 @@ def submenu_arvore(arvore, nome):
         else:
             print("Opção inválida. Tente novamente.")
 
+
 def comparar_arvores(dataset):
     tamanhos = [100, 500, 2000, 10000, 50000, 100000, len(dataset)]
     resultados_gerais = []
@@ -73,55 +76,41 @@ def comparar_arvores(dataset):
                 arvore.inserir(chave, dados)
             end_insercao = time.time()
 
-            start_busca = time.time()
-            for linha in dataset_teste[:10]:
-                arvore.buscar(linha['popularity'])
-            end_busca = time.time()
-
-            start_remocao = time.time()
-            for linha in dataset_teste[:10]:
-                arvore.remover_n(linha['popularity'], 1)
-            end_remocao = time.time()
+            altura = arvore.altura()
+            comparacoes = arvore.contador_comparacoes()
 
             resultados.append({
                 "Árvore": nome,
                 "Tamanho": n,
-                "Altura": arvore.altura(),
-                "Comparações": arvore.contador_comparacoes(),
+                "Altura": altura,
+                "Comparações": comparacoes,
                 "Tempo inserção": end_insercao - start_insercao,
-                "Tempo busca": end_busca - start_busca,
-                "Tempo remoção": end_remocao - start_remocao
             })
 
         resultados_gerais.extend(resultados)
 
         for r in resultados:
-            print(f"{r['Árvore']}: Altura = {r['Altura']}, Comparações = {r['Comparações']}, "
-                  f"Tempo Inserção = {r['Tempo inserção']:.4f}s, Tempo Busca = {r['Tempo busca']:.6f}s, "
-                  f"Tempo Remoção = {r['Tempo remoção']:.6f}s")
+            print(f"{r['Árvore']}: Altura = {r['Altura']}, "
+                  f"Comparações = {r['Comparações']}, "
+                  f"Tempo Inserção = {r['Tempo inserção']:.4f}s")
 
-    gerar_graficos(resultados_gerais)
+    gerar_grafico_insercao(resultados_gerais)
 
-def gerar_graficos(resultados):
-    import pandas as pd
+
+def gerar_grafico_insercao(resultados):
     df = pd.DataFrame(resultados)
+    plt.figure(figsize=(8,5))
+    for arvore in df["Árvore"].unique():
+        subset = df[df["Árvore"] == arvore]
+        plt.plot(subset["Tamanho"], subset["Tempo inserção"], marker='o', label=arvore)
+    plt.title("Tempo de Inserção vs Número de Músicas")
+    plt.xlabel("Número de Músicas")
+    plt.ylabel("Tempo (s)")
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
 
-    for metrica, titulo, ylabel in [
-        ("Tempo inserção", "Tempo de Inserção", "Tempo (s)"),
-        ("Tempo busca", "Tempo de Busca", "Tempo (s)"),
-        ("Tempo remoção", "Tempo de Remoção", "Tempo (s)")
-    ]:
-        plt.figure(figsize=(8,5))
-        for arvore in df["Árvore"].unique():
-            subset = df[df["Árvore"] == arvore]
-            plt.plot(subset["Tamanho"], subset[metrica], marker='o', label=arvore)
-        plt.title(f"{titulo} vs Número de Músicas")
-        plt.xlabel("Número de Músicas")
-        plt.ylabel(ylabel)
-        plt.legend()
-        plt.grid(True)
-        plt.tight_layout()
-        plt.show()
 
 def grafico_altura_vs_nos(dataset):
     tamanhos = [100, 500, 2000, 10000, 50000, 100000, len(dataset)]
@@ -160,6 +149,24 @@ def grafico_altura_vs_nos(dataset):
     plt.tight_layout()
     plt.show()
 
+
+def tabela_altura_comparacoes(dataset):
+    tamanhos = [100, 500, 2000, 10000, 50000, 100000, len(dataset)]
+    print("\nTamanho | Altura BST | Altura AVL | Altura RB | Comparações BST | Comparações AVL | Comparações RB")
+    print("-"*90)
+    for n in tamanhos:
+        subset = dataset[:n]
+        bst = BST(); avl = AVL(); rb = RedBlack()
+        for linha in subset:
+            chave = linha['popularity']
+            dados = {'track_name': linha['track_name']}
+            bst.inserir(chave, dados)
+            avl.inserir(chave, dados)
+            rb.inserir(chave, dados)
+        print(f"{n:6} | {bst.altura():10} | {avl.altura():10} | {rb.altura():9} | "
+              f"{bst.contador_comparacoes():15} | {avl.contador_comparacoes():15} | {rb.contador_comparacoes():14}")
+
+
 def main():
     dataset = load_spotify_dataset('dataset.csv')
     print(f"Total de músicas carregadas: {len(dataset)}")
@@ -172,9 +179,10 @@ def main():
         print("1 - Usar árvore AVL")
         print("2 - Usar árvore BST")
         print("3 - Usar árvore Red-Black")
-        print("4 - Comparação de desempenho entre árvores (gera gráficos)")
+        print("4 - Comparação de desempenho entre árvores (gera gráfico)")
         print("5 - Gerar gráfico: Altura da Árvore vs Número de Nós")
-        print("6 - Sair")
+        print("6 - Gerar tabela: Altura e Comparações entre Árvores")
+        print("7 - Sair")
         opcao = input("\nEscolha uma opção: \n")
 
         if opcao == '1':
@@ -232,11 +240,15 @@ def main():
             grafico_altura_vs_nos(dataset)
 
         elif opcao == '6':
+            tabela_altura_comparacoes(dataset)
+
+        elif opcao == '7':
             print("Saindo...")
             break
 
         else:
             print("Opção inválida. Tente novamente.")
+
 
 if __name__ == "__main__":
     main()

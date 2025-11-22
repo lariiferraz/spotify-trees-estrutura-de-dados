@@ -7,22 +7,20 @@ class BST:
         self.comparacoes = 0  # contador de comparações
 
     def inserir(self, chave, dados):
-        """Insere um novo nó na BST"""
-        self.raiz = self._inserir_rec(self.raiz, chave, dados)
+        """ponto de entrada para inserir algo na arvore"""
+        self.raiz = self._inserir_rec(self.raiz, chave, dados) 
 
-    def _inserir_rec(self, no, chave, dados):
+    def _inserir_rec(self, no, chave, dados): 
         if no is None:
             return Node(chave, [dados])
-
         self.comparacoes += 1
 
         if chave == no.chave:
             no.dados.append(dados)
-        elif chave < no.chave:
+        elif chave < no.chave: # menor
             no.esquerdo = self._inserir_rec(no.esquerdo, chave, dados)
-        else:
+        else: # maior
             no.direito = self._inserir_rec(no.direito, chave, dados)
-
         return no
 
     def buscar(self, chave):
@@ -30,17 +28,15 @@ class BST:
         return self._buscar_rec(self.raiz, chave)
 
     def _buscar_rec(self, no, chave):
-        if no is None:
+        if no is None: # chegamos no final e não encontramos
             return None
         self.comparacoes += 1
         if chave == no.chave:
             return no.dados
-        elif chave < no.chave:
+        elif chave < no.chave: #menor
             return self._buscar_rec(no.esquerdo, chave)
-        else:
+        else: #maior
             return self._buscar_rec(no.direito, chave)
-
-    # Adicione este método na classe BST
 
     def remover_n(self, chave, n):
         """Remove até n elementos com a chave informada"""
@@ -364,7 +360,6 @@ class RedBlack:
                 break
 
     def _remover_rec(self, no, chave):
-        """Remoção simples igual BST, sem balanceamento RB completo"""
         if no is None:
             return None
         self.comparacoes += 1

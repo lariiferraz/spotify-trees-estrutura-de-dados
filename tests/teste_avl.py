@@ -8,6 +8,8 @@ from trees import AVL
 # Criar a árvore AVL
 arvore = AVL()
 
+print("\nTESTE ÁRVORE AVL")
+
 # Inserir alguns nós manualmente (chave = popularidade)
 arvore.inserir(50, {'track_name': 'Song A', 'artist_name': 'Artist 1', 'genre': 'Pop'})
 arvore.inserir(70, {'track_name': 'Song B', 'artist_name': 'Artist 2', 'genre': 'Rock'})

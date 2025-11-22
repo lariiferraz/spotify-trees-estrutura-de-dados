@@ -3,10 +3,12 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # test_rbt_manual.py
-from trees import RedBlackTree
+from trees import RedBlack
 
 # Criar a árvore Red-Black
-arvore = RedBlackTree()
+arvore = RedBlack()
+
+print("\nTESTE ÁRVORE REDBLACK")
 
 # Inserir alguns nós manualmente (chave = popularidade)
 arvore.inserir(50, {'track_name': 'Song A', 'artist_name': 'Artist 1', 'genre': 'Pop'})

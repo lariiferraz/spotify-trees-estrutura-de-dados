@@ -8,6 +8,8 @@ from trees import BST
 # Criar a árvore
 arvore = BST()
 
+print("\nTESTE ÁRVORE BST")
+
 # Inserir alguns nós manualmente (chave = popularidade)
 arvore.inserir(50, {'track_name': 'Song A', 'artist_name': 'Artist 1', 'genre': 'Pop'})
 arvore.inserir(70, {'track_name': 'Song B', 'artist_name': 'Artist 2', 'genre': 'Rock'})

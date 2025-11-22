@@ -1,5 +1,3 @@
-# node.py
-
 class Node:
     """
     Classe que representa um nó da árvore.
@@ -10,12 +8,11 @@ class Node:
     - direito: referência para filho direito
     - cor: opcional, usado em árvores Red-Black ('red' ou 'black')
     """
-    def __init__(self, chave, dados, cor='black'):
+    def __init__(self, chave, dados):
         self.chave = chave          # Popularidade
         self.dados = dados          # Ex: {'track_name': ..., 'artist_name': ..., 'genre': ...}
         self.esquerdo = None        # Filho esquerdo
-        self.direito = None         # Filho direito
-        self.cor = cor              # Para Red-Black
+        self.direito = None         # Filho direito             
         self.altura = 1             # Altura inicial do nó é 1
 
 class NodeRB:
